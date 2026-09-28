@@ -1,5 +1,6 @@
 import * as Haptics from 'expo-haptics';
 import { useSQLiteContext } from 'expo-sqlite';
+import { Alert } from 'react-native';
 
 import { notifyDataChanged } from '@/db/events';
 import * as repo from '@/db/habits-repository';
@@ -21,6 +22,9 @@ export function useHabitActions() {
     await cancelReminder(habit.notificationId);
     const notificationId = time ? await scheduleDailyReminder(habit.name, time) : null;
     await repo.setNotificationId(db, habit.id, notificationId);
+    if (time && !notificationId && process.env.EXPO_OS !== 'web') {
+      Alert.alert('Reminders are off', 'Allow notifications for this app in Settings to get daily reminders.');
+    }
     return notificationId;
   }
 

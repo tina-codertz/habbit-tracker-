@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "habbit-tracker",
+    "name": "Habits",
     "slug": "habbit-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,12 +28,21 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#208AEF",
+          "backgroundColor": "#FFFFFF",
           "image": "./assets/images/splash-icon.png",
-          "imageWidth": 76
+          "imageWidth": 76,
+          "dark": {
+            "backgroundColor": "#0B0B0D"
+          }
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "color": "#9B5CC4"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
