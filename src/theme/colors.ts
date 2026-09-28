@@ -24,6 +24,8 @@ export const palette = {
     heatmapEmpty: '#EAEAEF',
     positive: '#3DBE72',
     danger: '#E5484D',
+    streak: '#FF8A4C',
+    award: '#F2B924',
   },
   dark: {
     background: '#0B0B0D',
@@ -43,6 +45,8 @@ export const palette = {
     heatmapEmpty: '#232328',
     positive: '#4FD18A',
     danger: '#FF6369',
+    streak: '#FF9A62',
+    award: '#F5C84A',
   },
 } as const;
 
