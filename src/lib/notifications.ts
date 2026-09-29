@@ -1,11 +1,20 @@
-import * as Notifications from 'expo-notifications';
+import { isRunningInExpoGo } from 'expo';
 
-const isSupported = process.env.EXPO_OS !== 'web';
+type NotificationsModule = typeof import('expo-notifications');
+
+// expo-notifications throws on import in Expo Go on Android (SDK 53+), so load it lazily
+// and treat reminders as unavailable there. Use a development build to test them.
+const isSupported =
+  process.env.EXPO_OS !== 'web' && !(process.env.EXPO_OS === 'android' && isRunningInExpoGo());
+const Notifications: NotificationsModule | null = isSupported
+  ? // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('expo-notifications')
+  : null;
 const CHANNEL_ID = 'habit-reminders';
 
 /** Call once at startup so reminders also show while the app is open. */
 export function configureNotifications() {
-  if (!isSupported) return;
+  if (!Notifications) return;
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
       shouldPlaySound: true,
@@ -18,7 +27,7 @@ export function configureNotifications() {
 
 /** Asks for permission if needed. Resolves `true` when reminders can be delivered. */
 export async function ensureNotificationPermission(): Promise<boolean> {
-  if (!isSupported) return false;
+  if (!Notifications) return false;
   if (process.env.EXPO_OS === 'android') {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: 'Habit reminders',
@@ -47,7 +56,7 @@ export function formatTime(time: string): string {
 
 /** Schedules a repeating daily reminder. Returns its id, or null if permission was denied. */
 export async function scheduleDailyReminder(habitName: string, time: string): Promise<string | null> {
-  if (!(await ensureNotificationPermission())) return null;
+  if (!Notifications || !(await ensureNotificationPermission())) return null;
   const { hour, minute } = parseTime(time);
   return Notifications.scheduleNotificationAsync({
     content: {
@@ -64,11 +73,11 @@ export async function scheduleDailyReminder(habitName: string, time: string): Pr
 }
 
 export async function cancelReminder(id: string | null) {
-  if (!isSupported || !id) return;
+  if (!Notifications || !id) return;
   await Notifications.cancelScheduledNotificationAsync(id).catch(() => {});
 }
 
 export async function cancelAllReminders() {
-  if (!isSupported) return;
+  if (!Notifications) return;
   await Notifications.cancelAllScheduledNotificationsAsync();
 }
